@@ -1,0 +1,4 @@
+Date- 24.12.2025
+
+1 - we need to get the first page as /login and redirect it via Server sider rendered
+2 - we need to take the css out of evrywhere
