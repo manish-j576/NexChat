@@ -2,3 +2,22 @@ Date- 24.12.2025
 
 1 - we need to get the first page as /login and redirect it via Server sider rendered
 2 - we need to take the css out of evrywhere
+3 - fix the prisma issue 
+4 - introduce next auth
+5 - introduce middleware 
+6 - poins to check 
+10. Verification Checklist (Before Moving Forward)
+
+Confirm all of the following:
+
+NextAuth sign-in works
+
+Session is created in PostgreSQL
+
+Middleware correctly protects routes
+
+Redis connection is stable
+
+App reload keeps user logged in
+
+If anything breaks, fix it before adding chat features.
