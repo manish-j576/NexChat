@@ -1,10 +1,12 @@
 
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+export default async function Home() {
 
-export default function Home() {
-  return (
-    <div className="bg-blue-200 text-4xl">
-      we have to navigate this to the /logi
-
-    </div>
-  );
+  const session = await getServerSession()
+  if(session?.user){
+    redirect("/chats");
+  }else{
+    redirect("/api/auth/signin")
+  }
 }
