@@ -34,7 +34,7 @@ export default function LoginForm({ onSwitch }: { onSwitch: () => void }) {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Login to your account</CardTitle>
+        <CardTitle className="text-xl bold">Login to your account</CardTitle>
         <CardDescription>
           Enter your email below to login to your account
         </CardDescription>
