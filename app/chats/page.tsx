@@ -1,4 +1,7 @@
 import { getServerSession } from "next-auth";
+import Logout from "../components/LogoutButton";
+import Login from "../components/LoginButton";
+import { json } from "stream/consumers";
 
 export default async function Chats() {
   const session =await getServerSession()
@@ -12,6 +15,11 @@ export default async function Chats() {
         </h1>
         <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
           This is a simple chat app built with Next.js and React.
+          <p>{JSON.stringify(session)}</p>
+          <div>
+
+          {session?.user ? <Logout></Logout> : <Login></Login>}
+          </div>
         </p>
       </main>
     </div>
