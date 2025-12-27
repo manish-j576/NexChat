@@ -1,16 +1,33 @@
 "use client";
-
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 export default function SignupForm({ onSwitch }: { onSwitch: () => void }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading , setLoading] = useState(false)
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true)
+    const formData = new FormData(e.currentTarget);
+    console.log("name :",formData.get("username"))
+    console.log("email :",formData.get("email"))
+    console.log("password :",formData.get("password"))
+    console.log("confirm password:",formData.get("confirmPassword"))
+    console.log("avatar:",formData.get("avatar"))
+
+    const response = await axios.post('/api/signup',formData)
+    console.log(response)
+    setLoading(false)
+  }
 
   return (
     <Card className="w-full max-w-sm">
@@ -19,7 +36,7 @@ export default function SignupForm({ onSwitch }: { onSwitch: () => void }) {
       </CardHeader>
 
       <CardContent>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="flex flex-col gap-2 ">
             <div className="mb-2">
               <Label className="mb-2">Name</Label>
@@ -45,9 +62,11 @@ export default function SignupForm({ onSwitch }: { onSwitch: () => void }) {
             <Label className="mb-2">Password</Label>
             <div className="relative">
               <Input
+                name="password"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter Password"
                 required
               />
 
@@ -68,9 +87,11 @@ export default function SignupForm({ onSwitch }: { onSwitch: () => void }) {
             <Label className="mb-2"> Confirm Password</Label>
             <div className="relative">
               <Input
+                name="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm Password"
                 required
               />
 
@@ -90,15 +111,23 @@ export default function SignupForm({ onSwitch }: { onSwitch: () => void }) {
           {confirmPassword && password !== confirmPassword && (
             <p className="text-sm text-red-500 mt-1">Passwords do not match</p>
           )}
-          <div className="mt-2" >
-              <Label className="mb-2"> Upload Profile Picture</Label>
+          <div className="mt-2">
+            <Label className="mb-2"> Upload Profile Picture</Label>
             <Input type="file" name="avatar" accept="image/*" required />
           </div>
           <Button
             className="w-full mt-4"
+            type="submit"
             disabled={password !== confirmPassword}
           >
-            Sign Up
+            {loading ? (
+              <>
+                <Spinner />
+                Loading...
+              </>
+            ) : (
+              "Sign Up"
+            )}
           </Button>
 
           <Button
