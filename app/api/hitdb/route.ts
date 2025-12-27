@@ -1,13 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export default async function POST() {
+export  async function POST() {
   try {
     const response = await prisma.user.create({
       data: {
         username: "manishjosh",
-        email: "manishjoshi705572@mail.com",
-        password: "qweqwe",
       },
     });
     console.log(response);
@@ -19,4 +17,10 @@ export default async function POST() {
       message: "error occured",
     });
   }
+}
+export  async function GET() {
+  return NextResponse.json({
+    message : "hello"
+  })
+  
 }

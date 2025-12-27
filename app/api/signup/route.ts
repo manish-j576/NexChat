@@ -55,11 +55,11 @@ export async function POST(req: Request) {
                 // console.log(prisma)
                 // Save ONLY the URL in DB
                 // await User.create({ username, avatar: avatarUrl })
-              const response = await prisma.user.findFirst({
-                where: { email },
-              });
+            //   const response = await prisma.user.findFirst({
+            //     where: { email },
+            //   });
 
-              console.log(response);
+            //   console.log(response);
         return NextResponse.json({
             message: "User registered",
         });
