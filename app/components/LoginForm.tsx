@@ -18,30 +18,46 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function LoginForm({ onSwitch }: { onSwitch: () => void }) {
-  const router = useRouter()
+
+
   const [loading , setLoading] = useState(false)
+  const router = useRouter()
+
+  //handleLogin function makes the nextAuth request and authenticate the user and if user is authenticated session is created
+  
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true)
     const formData = new FormData(e.currentTarget);
-
+    
+    //makes the nextAuth call 
     const loginResponse = await signIn("credentials", {
       username: formData.get("email"),
       password: formData.get("password"),
       redirect: false, // IMPORTANT
     });
-    console.log("login resposne here");
-    console.log(loginResponse);
+
     if (loginResponse?.ok && !loginResponse?.error) {
       console.log("login succeeded");
       setLoading(false)
       router.push("/chats");
     } else {
       console.error("Login failed", loginResponse?.error);
+      alert("Login Failed")
     }
 
     
   }
+
+
+    async function handleGoogleSignIn() {
+    setLoading(true);
+    await signIn("google", {
+      callbackUrl: "/chats",
+    });
+}
+
+    
 
   return (
     <Card className="w-full max-w-sm">
@@ -85,7 +101,11 @@ export default function LoginForm({ onSwitch }: { onSwitch: () => void }) {
       </CardContent>
 
       <CardFooter>
-        <Button variant="outline" className="w-full">
+        <Button
+          onClick={handleGoogleSignIn}
+          variant="outline"
+          className="w-full"
+        >
           Login with Google
         </Button>
       </CardFooter>

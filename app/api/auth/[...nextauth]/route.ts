@@ -2,8 +2,8 @@ import NextAuth from "next-auth"
 import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
-import { email } from "zod";
 import bcrypt from "bcrypt";
+import GoogleProvider from "next-auth/providers/google";
 //localhost:3000/api/auth/signin?callbackUrl=/
  const handler = NextAuth({
    secret: process.env.NEXTAUTH_SECRET,
@@ -18,34 +18,27 @@ import bcrypt from "bcrypt";
          username: { label: "Username", type: "text", placeholder: "jsmith" },
          password: { label: "Password", type: "password" },
        },
-       //@ts-ignore
        async authorize(credentials, req) {
-
-         console.log("inside next auth");
-        // const user = { id: "1", name: "J Smith", email: "jsmith@example.com" }
-         
-        // if(user){
-        //   return user 
-        // }else{
-        //   return null
-        // }
          // This is where you would query your database to check if the user exists and is active.
          const foundUser = await prisma.user.findFirst({
            where: {
              email: credentials?.username,
            },
          });
-
+         if (foundUser == null) {
+           return null;
+         }
          const isMatch = await bcrypt.compare(
            credentials?.password as string,
            foundUser?.password as string
          );
-         console.log("isMatch :" + isMatch);
+
          if (isMatch) {
            return {
              id: foundUser?.id.toString(),
              email: foundUser?.email,
              name: foundUser?.username,
+             avatarUrl: foundUser?.avatarUrl,
            };
          } else {
            // If you return null then an error will be displayed advising the user to check their details.
@@ -55,27 +48,53 @@ import bcrypt from "bcrypt";
          }
        },
      }),
-     GithubProvider({
-       clientId: "",
-       clientSecret: "",
+     GoogleProvider({
+       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
      }),
    ],
    callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
-    },
+     async signIn({ user, account }) {
+       if (account?.provider === "google") {
+         const existingUser = await prisma.user.findFirst({
+           where: { email: user.email! ?? ""},
+         });
 
-    async session({ session, token }) {
-      if (session.user) {
+         if (!existingUser) {
+           await prisma.user.create({
+             data: {
+               username: user.name ?? "user",
+               email: user.email!,
+               avatarUrl: user.image ?? "",
+             },
+           });
+         }
+       }
+       return true;
+     },
+
+     async jwt({ token, user }) {
+       if (user?.email) {
+         const dbUser = await prisma.user.findFirst({
+           where: { email: user.email },
+         });
+
+         if (dbUser) {
+           token.id = dbUser.id.toString();
+         }
+       }
+       return token;
+     },
+
+     async session({ session, token }) {
+       if (session.user && token.id) {
         //@ts-ignore
-        session.user.id = token.id as string;
-      }
-      return session;
-    },
-  },
+         session.user.id = token.id;
+       }
+       return session;
+     },
+   },
+
    pages: {
      signIn: "/login",
    },

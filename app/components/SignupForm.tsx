@@ -12,33 +12,33 @@ import { redirect } from "next/dist/server/api-utils";
 import { useRouter } from "next/navigation";
 
 export default function SignupForm({ onSwitch }: { onSwitch: () => void }) {
+  
+
+  //states to hide and show the password 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading , setLoading] = useState(false)
+
+  //imported the router using the useRouter hook
   const router = useRouter()
 
+
+  // handle function that will handle Signup followed by logging the user 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true)
     const formData = new FormData(e.currentTarget);
-    console.log("name :",formData.get("username"))
-    console.log("email :",formData.get("email"))
-    console.log("password :",formData.get("password"))
-    console.log("confirm password:",formData.get("confirmPassword"))
-    console.log("avatar:",formData.get("avatar"))
 
+    //api request to the backend to make the user signup
     const response = await axios.post('/api/signup',formData)
-    console.log(response)
     if (response.status === 200) {
       const loginResponse = await signIn("credentials", {
         username: formData.get("email"),
         password: formData.get("password"),
         redirect: false, // IMPORTANT
       });
-      console.log("login resposne here")
-      console.log(loginResponse)
       if (loginResponse?.ok && !loginResponse?.error) {
         console.log("login succeeded")
         router.push("/chats");
@@ -46,8 +46,6 @@ export default function SignupForm({ onSwitch }: { onSwitch: () => void }) {
         console.error("Login failed", loginResponse?.error);
       }
     }
-
-    console.log("ll")
     setLoading(false)
   }
 
