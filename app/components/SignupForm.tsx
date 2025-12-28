@@ -7,12 +7,17 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { signIn } from "next-auth/react";
+import { redirect } from "next/dist/server/api-utils";
+import { useRouter } from "next/navigation";
+
 export default function SignupForm({ onSwitch }: { onSwitch: () => void }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading , setLoading] = useState(false)
+  const router = useRouter()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,6 +31,23 @@ export default function SignupForm({ onSwitch }: { onSwitch: () => void }) {
 
     const response = await axios.post('/api/signup',formData)
     console.log(response)
+    if (response.status === 200) {
+      const loginResponse = await signIn("credentials", {
+        username: formData.get("email"),
+        password: formData.get("password"),
+        redirect: false, // IMPORTANT
+      });
+      console.log("login resposne here")
+      console.log(loginResponse)
+      if (loginResponse?.ok && !loginResponse?.error) {
+        console.log("login succeeded")
+        router.push("/chats");
+      } else {
+        console.error("Login failed", loginResponse?.error);
+      }
+    }
+
+    console.log("ll")
     setLoading(false)
   }
 

@@ -12,23 +12,35 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function LoginForm({ onSwitch }: { onSwitch: () => void }) {
+  const router = useRouter()
+  const [loading , setLoading] = useState(false)
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
+    setLoading(true)
     const formData = new FormData(e.currentTarget);
 
-    const res = await signIn("credentials", {
-      email: formData.get("email"),
+    const loginResponse = await signIn("credentials", {
+      username: formData.get("email"),
       password: formData.get("password"),
-      callbackUrl: "/chats",
+      redirect: false, // IMPORTANT
     });
-
-    if (res?.error) {
-      console.error("Invalid credentials");
+    console.log("login resposne here");
+    console.log(loginResponse);
+    if (loginResponse?.ok && !loginResponse?.error) {
+      console.log("login succeeded");
+      setLoading(false)
+      router.push("/chats");
+    } else {
+      console.error("Login failed", loginResponse?.error);
     }
+
+    
   }
 
   return (
@@ -60,7 +72,14 @@ export default function LoginForm({ onSwitch }: { onSwitch: () => void }) {
           </div>
 
           <Button type="submit" className="w-full mt-4">
-            Login
+            {loading ? (
+              <>
+                <Spinner />
+                Loading...
+              </>
+            ) : (
+              "Sign Up"
+            )}
           </Button>
         </form>
       </CardContent>

@@ -3,7 +3,7 @@ import cloudinary from "@/lib/cloudinary";
 import { userSchema } from "@/lib/validators";
 import { validateImageFile } from "@/lib/fileValidator";
 import { prisma } from "@/lib/prisma";
-
+import bcrypt from "bcrypt";
 export async function POST(req: Request) {
     try{
         const formData = await req.formData();
@@ -51,17 +51,27 @@ export async function POST(req: Request) {
                 const avatarUrl = uploadResult.secure_url
                 console.log(avatarUrl)
                 console.log("5")
-                
-                // console.log(prisma)
-                // Save ONLY the URL in DB
-                // await User.create({ username, avatar: avatarUrl })
-            //   const response = await prisma.user.findFirst({
-            //     where: { email },
-            //   });
-
-            //   console.log(response);
+            const respone = await prisma.user.findFirst({
+                where: { email },
+            });
+            if (respone) {
+                return NextResponse.json({
+                    message: "User already exists",
+                    status: 400,
+                });
+            }
+            const hashedPassword = await bcrypt.hash(password, 10);
+                const response = await prisma.user.create({
+                    data: {
+                        username,
+                        email,
+                        password:hashedPassword,
+                        avatarUrl
+                    },});
+               
         return NextResponse.json({
             message: "User registered",
+            status: 200,
         });
 
         }catch(error){

@@ -1,8 +1,12 @@
 import NextAuth from "next-auth"
 import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { prisma } from "@/lib/prisma";
+import { email } from "zod";
+import bcrypt from "bcrypt";
 //localhost:3000/api/auth/signin?callbackUrl=/
  const handler = NextAuth({
+   secret: process.env.NEXTAUTH_SECRET,
    providers: [
      CredentialsProvider({
        name: "Credentials",
@@ -14,13 +18,35 @@ import CredentialsProvider from "next-auth/providers/credentials";
          username: { label: "Username", type: "text", placeholder: "jsmith" },
          password: { label: "Password", type: "password" },
        },
+       //@ts-ignore
        async authorize(credentials, req) {
-         // Add logic here to look up the user from the credentials supplied
-         const user = { id: "1", name: "J Smith", email: "jsmith@example.com" };
 
-         if (user) {
-           // Any object returned will be saved in `user` property of the JWT
-           return user;
+         console.log("inside next auth");
+        // const user = { id: "1", name: "J Smith", email: "jsmith@example.com" }
+         
+        // if(user){
+        //   return user 
+        // }else{
+        //   return null
+        // }
+         // This is where you would query your database to check if the user exists and is active.
+         const foundUser = await prisma.user.findFirst({
+           where: {
+             email: credentials?.username,
+           },
+         });
+
+         const isMatch = await bcrypt.compare(
+           credentials?.password as string,
+           foundUser?.password as string
+         );
+         console.log("isMatch :" + isMatch);
+         if (isMatch) {
+           return {
+             id: foundUser?.id.toString(),
+             email: foundUser?.email,
+             name: foundUser?.username,
+           };
          } else {
            // If you return null then an error will be displayed advising the user to check their details.
            return null;
@@ -34,6 +60,22 @@ import CredentialsProvider from "next-auth/providers/credentials";
        clientSecret: "",
      }),
    ],
+   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        //@ts-ignore
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
+  },
    pages: {
      signIn: "/login",
    },
