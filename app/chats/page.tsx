@@ -2,26 +2,21 @@ import { getServerSession } from "next-auth";
 import Logout from "../components/LogoutButton";
 import Login from "../components/LoginButton";
 import { json } from "stream/consumers";
-
+import { SidebarTrigger } from "@/components/ui/sidebar";
 export default async function Chats() {
   const session =await getServerSession()
   console.log(session)
   
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-          Chats
-        </h1>
-        <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-          This is a simple chat app built with Next.js and React.
-          <p>{JSON.stringify(session)}</p>
-          <div>
-
-          {session?.user ? <Logout></Logout> : <Login></Login>}
-          </div>
-        </p>
-      </main>
+    <div className="flex min-h-screen bg-zinc-50 font-sans dark:bg-black w-full flex-col h-full">
+      <div className="bg-blue-400">
+      <SidebarTrigger className="size-10"/>
+      </div>
+      <div className="h-full bg-red-200">
+        <div className="w-full bg-amber-400 h-15">Chat header</div>
+        <div className="w-full bg-blue-400 h-[80%]">Main chats section</div>
+        <div className="w-full bg-amber-800 h-15">sned input box and send icon</div>
+      </div>
     </div>
   );
 }
