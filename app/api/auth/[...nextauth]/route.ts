@@ -1,5 +1,4 @@
 import NextAuth from "next-auth"
-import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
@@ -38,7 +37,7 @@ import GoogleProvider from "next-auth/providers/google";
              id: foundUser?.id.toString(),
              email: foundUser?.email,
              name: foundUser?.username,
-             avatarUrl: foundUser?.avatarUrl,
+             image: foundUser?.avatarUrl,
            };
          } else {
            // If you return null then an error will be displayed advising the user to check their details.
@@ -81,6 +80,7 @@ import GoogleProvider from "next-auth/providers/google";
 
          if (dbUser) {
            token.id = dbUser.id.toString();
+           token.image = dbUser.avatarUrl;
          }
        }
        return token;
@@ -90,6 +90,8 @@ import GoogleProvider from "next-auth/providers/google";
        if (session.user && token.id) {
         //@ts-ignore
          session.user.id = token.id;
+         //@ts-ignore
+         session.user.image = token.image;
        }
        return session;
      },

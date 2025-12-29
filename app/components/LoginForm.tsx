@@ -94,7 +94,7 @@ export default function LoginForm({ onSwitch }: { onSwitch: () => void }) {
                 Loading...
               </>
             ) : (
-              "Sign Up"
+              "Log In"
             )}
           </Button>
         </form>
