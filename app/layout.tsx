@@ -9,7 +9,8 @@ export default function RootLayout({
   return (
     <html lang="en" >
       <body className="dark">
-        {children}
+        
+           {children}
       </body>
     </html>
   );

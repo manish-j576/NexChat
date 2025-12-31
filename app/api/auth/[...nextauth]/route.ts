@@ -1,11 +1,15 @@
-import NextAuth from "next-auth"
+import NextAuth from "next-auth/next"
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import GoogleProvider from "next-auth/providers/google";
+import { use } from "react";
 //localhost:3000/api/auth/signin?callbackUrl=/
  const handler = NextAuth({
    secret: process.env.NEXTAUTH_SECRET,
+   session: {
+     strategy: "jwt",
+   },
    providers: [
      CredentialsProvider({
        name: "Credentials",
@@ -56,7 +60,7 @@ import GoogleProvider from "next-auth/providers/google";
      async signIn({ user, account }) {
        if (account?.provider === "google") {
          const existingUser = await prisma.user.findFirst({
-           where: { email: user.email! ?? ""},
+           where: { email: user.email! ?? "" },
          });
 
          if (!existingUser) {
@@ -79,22 +83,29 @@ import GoogleProvider from "next-auth/providers/google";
          });
 
          if (dbUser) {
+           console.log("id = user  id is below");
+
            token.id = dbUser.id.toString();
            token.image = dbUser.avatarUrl;
+           console.log(token);
          }
        }
        return token;
      },
 
-     async session({ session, token }) {
-       if (session.user && token.id) {
-        //@ts-ignore
-         session.user.id = token.id;
-         //@ts-ignore
-         session.user.image = token.image;
-       }
-       return session;
-     },
+        async session({ session, token }) {
+          console.log("this is insde session callback");
+          console.log(session);
+          if (session.user && token.id) {
+            session.user.id = token.sub as string;
+            session.user.image = token.image as string;
+            console.log("here is the session information");
+            console.log(session);
+          }
+
+          console.log("session is above");
+          return session;
+        },
    },
 
    pages: {
@@ -103,4 +114,3 @@ import GoogleProvider from "next-auth/providers/google";
  });
 
 export { handler as GET, handler as POST }
-
