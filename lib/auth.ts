@@ -85,6 +85,7 @@ export const authOptions: NextAuthOptions = {
 
           token.id = dbUser.id.toString();
           token.image = dbUser.avatarUrl;
+          token.role = "ADDMINSS"
           console.log(token);
         }
       }
@@ -97,6 +98,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user && token.id) {
         session.user.id = token.id as string;
         session.user.image = token.image as string;
+        session.user.role = token.role as string;
         console.log("here is the session information");
         console.log(session);
       }
