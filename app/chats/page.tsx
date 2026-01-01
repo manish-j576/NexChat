@@ -3,8 +3,10 @@ import { getServerSession } from "next-auth";
 import Logout from "../components/LogoutButton";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import TestButton from "../components/TestButton";
+import { authOptions } from "@/lib/auth";
+// import { SessionProvider } from "next-auth/react";
 export default async function Chats() {
-  const session =await getServerSession()
+  const session =await getServerSession(authOptions)
   console.log("session have the following")
   console.log(session)
   
@@ -14,7 +16,9 @@ export default async function Chats() {
       <SidebarTrigger className="size-10"/>
       </div>
       <div className="h-full bg-red-200">
+        {/* <SessionProvider> */}
         <TestButton></TestButton>
+        {/* </SessionProvider> */}
         <Logout></Logout>
         <div className="w-full bg-amber-400 h-15">Chat header</div>
         <div className="w-full bg-blue-400 h-[80%]">Main chats section</div>
