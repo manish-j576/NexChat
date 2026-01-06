@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
-import { use, useState } from "react";
+import { useState } from "react";
 import { SearchedUsers } from "./SearchedUsers";
 import { SessionProvider} from "next-auth/react";
 import { Spinner } from "@/components/ui/spinner";
@@ -43,7 +43,6 @@ export default function SearchBar(){
     return (
       <div>
         <div className="flex gap-2 mb-4">
-          {/* <Input onChange={} name="Search" type="text" placeholder="Search Friends" required /> */}
           <Input
             onChange={handleChange}
             name="Search"

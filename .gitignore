@@ -44,7 +44,8 @@ next-env.d.ts
 issues.txt
 progress.txt
 /lib/generated/prisma
-
+/app/ws-backend/node_modules
+/app/ws-backend/dist
 /generated/prisma
 
 /lib/generated/prisma

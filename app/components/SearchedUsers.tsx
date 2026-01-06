@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Session } from "inspector/promises";
 import { useSession } from "next-auth/react";
+import axios from "axios";
 
 type UserCardProps = {
     id : string
@@ -12,16 +13,21 @@ type UserCardProps = {
   imageUrl: string;
 };
 
-export function SearchedUsers(props: UserCardProps) {
+export  function SearchedUsers(props: UserCardProps) {
   const {data : Session} = useSession()
   console.log(Session)
-  function handleSend() {
+  async function handleSend() {
     console.log("send button pressed");
     console.log(props);
     console.log(Session)
+    const response = await axios.post(`/api/friends/send-request`, {
+      userId : Session?.user?.id,
+      friendId : props.id
+    });
+    console.log(response);
   }
   return (
-    <Card className="w-full max-w-md p-1">
+    <Card className="w-full max-w-md p-0 mb-2">
       <CardContent className="flex items-center justify-between p-1 ">
         {/* Left: Avatar + Name */}
         <div className="flex items-center gap-1">
