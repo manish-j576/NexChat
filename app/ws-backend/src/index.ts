@@ -1,9 +1,10 @@
-import "dotenv/config";
+import dotenv from "dotenv"
 import WebSocket, { WebSocketServer } from "ws";
-import { jwtVerify } from "jose";
-import { jwtDecrypt } from "jose";
+import jwt from "jsonwebtoken"
 import http from "http";
 const PORT = 3001;
+
+dotenv.config()
 
 /**
  * userId -> multiple sockets (tabs/devices)
@@ -33,31 +34,29 @@ if (!secret) {
   ws.close(1011, "Server misconfigured");
   return;
 }
+
+
 const key = Buffer.from(secret, "base64");
+console.log(secret)
     // ---- 2. Verify JWT (NextAuth secret) ----
-    const { payload } = await jwtVerify(
-      token,
-      key
-    );
+    const data = await jwt.verify(token, secret);
 
-    const userId = payload.id as string;
-
-    if (!userId) {
-      ws.close(1008, "Invalid token");
-      return;
-    }
+    // const userId = data.id as string;
+    console.log("controlled reached here jwt is verified")
+    console.log(data)
+    // if (!userId) {
+    //   ws.close(1008, "Invalid token");
+    //   return;
+    // }
 
     // ---- 3. Store socket ----
-    if (!users.has(userId)) {
-      users.set(userId, new Set());
-    }
-
-    users.get(userId)!.add(ws);
-
-    console.log(`✅ WS connected: ${userId}`);
+    // if (!users.h   `✅ WS connected: ${userId}`);
 
     // ---- 4. Listen for messages (optional) ----
     ws.on("message", (data) => {
+
+      console.log("what is the message")
+      console.log(data.toString())
       try {
         const message = JSON.parse(data.toString());
         console.log("📩 Message:", message);
@@ -67,16 +66,7 @@ const key = Buffer.from(secret, "base64");
     });
 
     // ---- 5. Cleanup on close ----
-    ws.on("close", () => {
-      users.get(userId)?.delete(ws);
-
-      if (users.get(userId)?.size === 0) {
-        users.delete(userId);
-      }
-
-      console.log(`❌ WS disconnected: ${userId}`);
-    });
-
+    
     ws.on("error", () => {
       ws.close();
     });
@@ -102,3 +92,4 @@ export function emitToUser(userId: string, payload: unknown) {
 server.listen(PORT, () => {
   console.log(`🚀 WebSocket server running on ws://localhost:${PORT}`);
 });
+    

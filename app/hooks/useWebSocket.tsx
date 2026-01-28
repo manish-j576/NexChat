@@ -1,46 +1,63 @@
 "use client";
 
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export function useWebSocket() {
+  const wsRef = useRef<WebSocket | null>(null);
+
   useEffect(() => {
-    let ws: WebSocket;
+    let isMounted = true;
 
     async function connect() {
-      console.log("connecting to ws")
-      
-      const res = await axios.get("/api/ws-token");
-      console.log(res)
-      if (!res.data) return;
+      try {
+        console.log("Connecting to WS...");
 
-      const token = await res.data;
-      console.log(token.token)
-      ws = new WebSocket(
-        `ws://localhost:3001?token=${encodeURIComponent(res.data.token)}`
-      );
-      console.log("ws")
-      console.log(ws)
-      ws.onopen = () => {
-        console.log("✅ WS connected");
-      };
+        const res = await axios.get("/api/ws-token");
+        if (!res.data?.token || !isMounted) return;
 
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
+        const ws = new WebSocket(
+          `ws://localhost:3001?token=${encodeURIComponent(res.data.token)}`,
+        );
 
-        if (data.type === "FRIEND_REQUEST") {
-          console.log("📩 Friend request:", data.payload);
-          // update state / show notification
-        }
-      };
+        ws.onopen = () => {
+          console.log("✅ WS connected");
+        };
 
-      ws.onclose = () => {
-        console.log("❌ WS disconnected");
-      };
+        ws.onclose = () => {
+          console.log("❌ WS disconnected");
+        };
+
+        ws.onerror = (err) => {
+          console.error("WS error", err);
+        };
+
+        wsRef.current = ws;
+      } catch (err) {
+        console.error("WS connection failed", err);
+      }
     }
 
     connect();
 
-    return () => ws?.close();
+    return () => {
+      isMounted = false;
+      wsRef.current?.close();
+      wsRef.current = null;
+    };
   }, []);
+
+  // ✅ expose controlled API
+  function sendMessage(data: unknown) {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify(data));
+    } else {
+      console.warn("WS not connected");
+    }
+  }
+
+  return {
+    socket: wsRef,
+    sendMessage,
+  };
 }

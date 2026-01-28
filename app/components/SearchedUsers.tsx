@@ -3,7 +3,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Session } from "inspector/promises";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 
@@ -24,7 +23,10 @@ export  function SearchedUsers(props: UserCardProps) {
       userId : Session?.user?.id,
       friendId : props.id
     });
+    console.log("resposne is ")
     console.log(response);
+
+    
   }
   return (
     <Card className="w-full max-w-md p-0 mb-2">

@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const token = await new SignJWT({
+   const token = await new SignJWT({
     id: session.user.id,
   })
     .setProtectedHeader({ alg: "HS256" })

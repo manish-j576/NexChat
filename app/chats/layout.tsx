@@ -8,12 +8,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-      <TestWSComponent></TestWSComponent>
       <AppSidebar />
-      <main className="w-full">
-        
-        {children}
-      </main>
+
+      <TestWSComponent></TestWSComponent>
+      <main className="w-full">{children}</main>
     </SidebarProvider>
   );
 }

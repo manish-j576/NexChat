@@ -21,6 +21,7 @@
     "@types/axios": "^0.9.36",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/ws": "^8.18.1",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
@@ -37,7 +38,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "tailwind-merge": "^3.4.0",
-    "ws": "^8.18.3",
+    "ws": "^8.19.0",
     "zod": "^4.2.1"
   },
   "devDependencies": {
